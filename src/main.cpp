@@ -115,5 +115,5 @@ void loop() {
     Serial.print(tail);
 
     //delay a second
-    delay(1000);
+    delay(50);
 }

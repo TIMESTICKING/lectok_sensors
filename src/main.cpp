@@ -17,6 +17,9 @@ Adafruit_AMG88xx amg;
 
 volatile bool intReceived = false;
 uint8_t pixelInts[8];
+char headers[2] = {0x77, 0x88};
+char tail = 0x66;
+float pixels[AMG88xx_PIXEL_ARRAY_SIZE];
 /******* 
 we can tell which pixels triggered the interrupt by reading the
 bits in this array of bytes. Any bit that is a 1 means that pixel triggered
@@ -68,22 +71,49 @@ void setup() {
 
 }
 
-void loop() {
+// void loop() {
   
-  if(intReceived){
-    //get which pixels triggered
-    amg.getInterrupt(pixelInts);
+//   if(intReceived){
+//     //get which pixels triggered
+//     amg.getInterrupt(pixelInts);
 
-    Serial.println("**** interrupt received! ****");
-    for(int i=0; i<8; i++){
-      Serial.println(pixelInts[i], BIN);
-    }
-    Serial.println();
+//     Serial.println("**** interrupt received! ****");
+//     for(int i=0; i<8; i++){
+//       Serial.println(pixelInts[i], BIN);
+//     }
+//     Serial.println();
 
-    //clear the interrupt so we can get the next one!
-    amg.clearInterrupt();
+//     //clear the interrupt so we can get the next one!
+//     amg.clearInterrupt();
     
-    intReceived = false;
-  }
-}
+//     intReceived = false;
+//   }
+// }
 
+void loop() { 
+    //read all the pixels
+    amg.readPixels(pixels);
+
+    // Serial.print("[");
+    // for(int i=1; i<=AMG88xx_PIXEL_ARRAY_SIZE; i++){
+    //   Serial.print(pixels[i-1]);
+    //   Serial.print(", ");
+    //   if( i%8 == 0 ) Serial.println();
+    // }
+    // Serial.println("]");
+    // Serial.println();
+
+    Serial.print(headers);
+    for(int i=0; i<AMG88xx_PIXEL_ARRAY_SIZE; i++){
+      unsigned char *byteArray = (unsigned char *)&pixels[i];
+    
+      // 发送4个字节
+      for (int j = 0; j < sizeof(float); j++) {
+        Serial.write(byteArray[j]);
+      }
+    }
+    Serial.print(tail);
+
+    //delay a second
+    delay(1000);
+}

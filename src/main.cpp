@@ -50,6 +50,13 @@ int trigger_pin = 32;
 int echo_pin = 33;
 HCSR04 ultrasonicSensor(trigger_pin, echo_pin, 15, 200);
 
+
+
+// mux
+portMUX_TYPE serial_mux = portMUX_INITIALIZER_UNLOCKED;
+
+
+
 void AMG88xx_ISR() {
   //keep your ISR short!
   //we don't really want to be reading from or writing to the sensor from inside here.
@@ -124,11 +131,13 @@ void IR_reader(void *para) {
     //read all the pixels
     amg.readPixels(pixels);
 
+    taskENTER_CRITICAL(&serial_mux);
     Serial.print(headers);
     for(int i=0; i<AMG88xx_PIXEL_ARRAY_SIZE; i++){
       send_float((u_char *)&pixels[i]);
     }
     Serial.print(tail);
+    taskEXIT_CRITICAL(&serial_mux);
 
     //delay a second
     vTaskDelay(pdMS_TO_TICKS(100));
@@ -143,16 +152,17 @@ void ultrasonic_reader(void * para){
   float filterd_distance = 0;
   while (1)
   {
-    distance = ultrasonicSensor.getDistance();
-
-    
-
-    vTaskDelay(pdMS_TO_TICKS(100));
+    // distance = ultrasonicSensor.getDistance();
+    // vTaskDelay(pdMS_TO_TICKS(100));
 
 
     filterd_distance = ultrasonicSensor.getMedianFilterDistance(); //pass 3 measurements through median filter, better result on moving obstacles
 
-
+    taskENTER_CRITICAL(&serial_mux);
+    Serial.print(headers);
+    send_float((u_char *)&filterd_distance);
+    Serial.print(tail);
+    taskEXIT_CRITICAL(&serial_mux);
 
     vTaskDelay(pdMS_TO_TICKS(100));
   }

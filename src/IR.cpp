@@ -15,7 +15,7 @@ Adafruit_AMG88xx amg;
 //30 degrees should trigger when you wave your hand in front of the sensor
 #define TEMP_INT_HIGH 30
 #define TEMP_INT_LOW 15
-#define PACKAGE_SZ (AMG88xx_PIXEL_ARRAY_SIZE * 4 + 3)
+#define PACKAGE_SZ (AMG88xx_PIXEL_ARRAY_SIZE * 4 + 4)
 
 volatile bool intReceived = false;
 uint8_t pixelInts[8];
@@ -72,9 +72,10 @@ void AMG88xx_ISR() {
 }
 
 void IR_reader(void *para) { 
-	IR_package[0] = 0x77;
-	IR_package[1] = 0x88;
-	IR_package[2 + AMG88xx_PIXEL_ARRAY_SIZE * 4] = 0x66;
+	IR_package[0] = PKG_HD1;
+	IR_package[1] = PKG_HD2;
+	IR_package[2] = 0x01; // tag
+	IR_package[3 + AMG88xx_PIXEL_ARRAY_SIZE * 4] = PKG_TL;
 
   while (1)
   {  

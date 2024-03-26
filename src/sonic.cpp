@@ -9,12 +9,13 @@ HCSR04 ultrasonicSensor(trigger_pin, echo_pin, 15, 200);
 
 TaskHandle_t *sonic_read_handler;
 
-u_char sonic_package[7];
+u_char sonic_package[8];
 
 void ultrasonic_reader(void * para){
-  sonic_package[0] = 0xAF;
-  sonic_package[1] = 0xFA;
-  sonic_package[6] = 0xFF;
+  sonic_package[0] = PKG_HD1;
+  sonic_package[1] = PKG_HD2;
+  sonic_package[2] = 0x02;
+  sonic_package[7] = PKG_TL;
   float filterd_distance = 0;
   while (1)
   {

@@ -8,6 +8,7 @@
 #define trigger_pin 32
 #define echo_pin 33
 
+
 void ultrasonic_reader(void * para);
 
 extern HCSR04 ultrasonicSensor;

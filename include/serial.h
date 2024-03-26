@@ -8,6 +8,12 @@
 void serial_queue_init();
 void uartSendTask(void *pvParameters);
 
+// package definition
+#define PKG_HD1 0xAF
+#define PKG_HD2 0xFA
+#define PKG_TL 0xFF
+
+
 // queue usart
 #define QUEUE_LENGTH 10
 #define MAX_DATA_SIZE 20

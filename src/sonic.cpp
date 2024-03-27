@@ -25,7 +25,10 @@ void ultrasonic_reader(void * para){
 
     filterd_distance = ultrasonicSensor.getMedianFilterDistance(); //pass 3 measurements through median filter, better result on moving obstacles
 
-    memcpy(&sonic_package[2], (u_char*)&filterd_distance, 4);
+    // Serial.print("sonic is:");
+    // Serial.println(filterd_distance);
+
+    memcpy(&sonic_package[3], (u_char*)&filterd_distance, 4);
 
     xQueueSend(uartQueue, &sonic_package, portMAX_DELAY);
 

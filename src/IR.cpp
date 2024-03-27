@@ -81,7 +81,7 @@ void IR_reader(void *para) {
   {  
     //read all the pixels
     amg.readPixels(
-			(float*)&IR_package[2]
+			(float*)&IR_package[3]
 		);
 
 		for (int i=0; i<PACKAGE_SZ; i+=MAX_DATA_SIZE)

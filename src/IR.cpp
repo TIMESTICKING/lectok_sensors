@@ -4,6 +4,7 @@
 #include <Wire.h>
 #include <Adafruit_AMG88xx.h>
 #include "serial.h"
+#include "vars.h"
 
 Adafruit_AMG88xx amg;
 
@@ -42,9 +43,9 @@ TaskHandle_t *IR_read_handler;
 void IR_setup() {
   bool status;
 
-	pinMode(INT_PIN, INPUT);
+	// pinMode(INT_PIN, INPUT);
 
-  Serial.println("AMG88xx interrupt test");
+  // Serial.println("AMG88xx interrupt test");
   
   // default settings
   status = amg.begin();
@@ -84,9 +85,12 @@ void IR_reader(void *para) {
 			(float*)&IR_package[3]
 		);
 
-		for (int i=0; i<PACKAGE_SZ; i+=MAX_DATA_SIZE)
-			xQueueSend(uartQueue, &IR_package[i], portMAX_DELAY);
-
+    if (xSemaphoreTake(xMutex, (TickType_t)10) == pdTRUE) {
+      for (int i=0; i<PACKAGE_SZ; i+=MAX_DATA_SIZE)
+        xQueueSend(uartQueue, &IR_package[i], portMAX_DELAY);
+      // 释放互斥量
+      xSemaphoreGive(xMutex);
+    }
     // Serial.print(headers);
     // for(int i=0; i<AMG88xx_PIXEL_ARRAY_SIZE; i++){
     //   send_float((u_char *)&pixels[i]);
